@@ -14,7 +14,7 @@ public class WordSearch3D {
 	 * You should not need to modify this method.
 	 * @param grid the grid of characters comprising the word search puzzle
 	 * @param words the words to search for
-	 * @param a list of lists of locations of the letters in the words
+	 *
 	 */
 	public int[][][] searchForAll (char[][][] grid, String[] words) {
 		final int[][][] locations = new int[words.length][][];
@@ -32,25 +32,31 @@ public class WordSearch3D {
 	 * word, then the method returns a list of the (3-d) locations of its letters; if not, 
 	 */
 	public int[][] search (char[][][] grid, String word) {
-		// TODO: implement me
 		for(int i = 0;i < grid.length; i++){
 			for(int j = 0; j < grid[0].length; j++){
 				for(int k = 0; k < grid[0][0].length;k++){
 					if(grid[i][j][k] == word.charAt(0)){
-						for(int a = -1; a < 2; a++){
-							for(int b = -1; b < 2; b++){
-								for(int c = -1; c < 2; c++){
-									if(a == 0 && b == 0 && c == 0){
-										continue;
-									}
-									int[][] result = checkDirection(grid, word, i, j, k, a, b, c);
-									if(result != null){
-										return result;
-									}
-								}
-							}
+						int[][] result = loopThroughAllDirections(grid, word, i, j, k);
+						if(result != null){
+							return result;
 						}
+					}
+				}
+			}
+		}
+		return null;
+	}
 
+	private int[][] loopThroughAllDirections(char[][][] grid, String word, int iCurrent, int jCurrent, int kCurrent){
+		for(int a = -1; a < 2; a++){
+			for(int b = -1; b < 2; b++){
+				for(int c = -1; c < 2; c++){
+					if(a == 0 && b == 0 && c == 0){
+						continue;
+					}
+					int[][] result = checkDirection(grid, word, iCurrent, jCurrent, kCurrent, a, b, c);
+					if(result != null){
+						return result;
 					}
 				}
 			}
@@ -84,9 +90,9 @@ public class WordSearch3D {
 	private boolean isValidPosition(char[][][] grid, int i , int j , int k){
 		if(i < 0 || i >=  grid.length){
 			return false;
-		} else if(j < 0 || j >=  grid.length){
+		} else if(j < 0 || j >=  grid[0].length){
 			return false;
-		} else if(k < 0 || k >=  grid.length) {
+		} else if(k < 0 || k >=  grid[0][0].length) {
 			return false;
 		}
 		return true;
@@ -103,8 +109,88 @@ public class WordSearch3D {
 	 * no satisfying grid could be found.
 	 */
 	public char[][][] make (String[] words, int sizeX, int sizeY, int sizeZ) {
-		// TODO: implement me
+		char[][][] wordSearch = new char[sizeX][sizeY][sizeZ];
+		final Random rng = new Random();
+
+		for(int i = 0; i < words.length; i++){
+			if(!checkFitWithinGrid(wordSearch, words[i])) {
+				return null;
+			}
+		}
+
+		for(int i = 0; i < words.length; i++){
+			int randomX = rng.nextInt(sizeX);
+			int randomY = rng.nextInt(sizeY);
+			int randomZ = rng.nextInt(sizeZ);
+
+			int randomXDirection = rng.nextInt(3) - 1; // -1, to 1
+			int randomYDirection = rng.nextInt(3) - 1;
+			int randomZDirection = rng.nextInt(3) - 1;
+
+
+			char[][][] tmp = placeWordInGrid(wordSearch, words[i], randomX, randomY, randomZ, randomXDirection, randomYDirection, randomZDirection);
+			while(tmp == null){
+
+				randomX = rng.nextInt(sizeX);
+				randomY = rng.nextInt(sizeY);
+				randomZ = rng.nextInt(sizeZ);
+
+				randomXDirection = rng.nextInt(3) - 1; // -1, to 1
+				randomYDirection = rng.nextInt(3) - 1;
+				randomZDirection = rng.nextInt(3) - 1;
+				tmp = placeWordInGrid(wordSearch, words[i], randomX, randomY, randomZ, randomXDirection, randomYDirection, randomZDirection);
+			}
+			wordSearch = placeWordInGrid(wordSearch, words[i], randomX, randomY, randomZ, randomXDirection, randomYDirection, randomZDirection);
+			printGrid(wordSearch);
+
+		}
+
+		final char randomLetter = (char) (rng.nextInt(26) + 'a');
+
+
 		return null;
+	}
+
+	private void printGrid(char[][][] grid){
+		for(int i = 0; i < grid.length; i++){
+			for(int j = 0; j < grid[0].length; j++){
+				for(int k = 0; k < grid[0][0].length;k++){
+					if(grid[i][j][k] == '\u0000'){
+						System.out.print(".");
+					}else {
+						System.out.print(grid[i][j][k]);
+					}
+				}
+				System.out.println();
+			}
+			System.out.println();
+		}
+	}
+
+	private char[][][] placeWordInGrid(char[][][] grid, String word, int startX, int startY, int startZ, int dirX, int dirY, int dirZ ){
+
+		if(grid[startX][startY][startZ] != '\u0000' && grid[startX][startY][startZ] != word.charAt(0)){
+			return null;
+		}
+		grid[startX][startY][startZ] = word.charAt(0);
+		for(int i = 1; i < word.length(); i++){
+			if(!isValidPosition(grid, startX + i * dirX, startY + i * dirY, startZ + i * dirZ)){
+				return null;
+			}
+			if(grid[startX + i * dirX][startY + i * dirY][startZ + i * dirZ] != '\u0000' && grid[startX + i * dirX][startY + i * dirY][startZ + i * dirZ] != word.charAt(i)){
+				return null;
+			}
+			grid[startX + i * dirX][startY + i * dirY][startZ + i * dirZ] = word.charAt(i);
+		}
+		return grid;
+
+	}
+
+	private boolean checkFitWithinGrid(char[][][] grid, String word){
+		if(word.length() > Math.max(Math.max(grid.length, grid[0].length), grid[0][0].length)){
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -180,12 +266,17 @@ public class WordSearch3D {
 	 */
 	public static void main (String[] args) {
 		final WordSearch3D wordSearch = new WordSearch3D();
-		final String[] words = new String[] { "apple", "orange", "pear", "peach", "durian", "lemon", "lime", "jackfruit", "plum", "grape", "apricot", "blueberry", "tangerine", "coconut", "mango", "lychee", "guava", "strawberry", "kiwi", "kumquat", "persimmon", "papaya", "longan", "eggplant", "cucumber", "tomato", "zucchini", "olive", "pea", "pumpkin", "cherry", "date", "nectarine", "breadfruit", "sapodilla", "rowan", "quince", "toyon", "sorb", "medlar" };
+		final String[] words = new String[] { "apple" /*, "orange", "pear", "peach", "durian", "lemon", "lime", "jackfruit", "plum", "grape", "apricot", "blueberry", "tangerine", "coconut", "mango", "lychee", "guava", "strawberry", "kiwi", "kumquat", "persimmon", "papaya", "longan", "eggplant", "cucumber", "tomato", "zucchini", "olive", "pea", "pumpkin", "cherry", "date", "nectarine", "breadfruit", "sapodilla", "rowan", "quince", "toyon", "sorb", "medlar"*/ };
 		final int xSize = 10, ySize = 10, zSize = 10;
-		final char[][][] grid = wordSearch.make(words, xSize, ySize, zSize);
-		exportGrid(grid, "grid.txt");
+ 		final char[][][] grid = wordSearch.make(words, xSize, ySize, zSize);
+//		exportGrid(grid, "grid.txt");
+//
+//		final int[][][] locations = wordSearch.searchForAll(grid, words);
+//		exportLocations(locations, "locations.txt");
 
-		final int[][][] locations = wordSearch.searchForAll(grid, words);
-		exportLocations(locations, "locations.txt");
+		final char[][][] grid2 = new char[][][] { { { 'a', 'b', 'c' },
+				{ 'd', 'f', 'e' } } };
+		WordSearch3D _wordSearch = new WordSearch3D();
+		final int[][] location = _wordSearch.search(grid2, "be");
 	}
 }

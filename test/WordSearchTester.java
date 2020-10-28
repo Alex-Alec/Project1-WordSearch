@@ -30,23 +30,23 @@ public class WordSearchTester {
 		// TODO: implement me
 	}
 
-        @Test
-        /**
-         *  Verifies that search works correctly in a tiny grid that is effectively 2D.
-         */
-        public void testSearchSimple () {
-                // Note: this grid is 1x2x3 in size
-                final char[][][] grid = new char[][][] { { { 'a', 'b', 'c' },
-                                                           { 'd', 'f', 'e' } } };
-                final int[][] location = _wordSearch.search(grid, "be");
-                assertNotNull(location);
-                assertEquals(location[0][0], 0);
-                assertEquals(location[0][1], 0);
-                assertEquals(location[0][2], 1);
-                assertEquals(location[1][0], 0);
-                assertEquals(location[1][1], 1);
-                assertEquals(location[1][2], 2);
-        }
+	@Test
+	/**
+	 *  Verifies that search works correctly in a tiny grid that is effectively 2D.
+	 */
+	public void testSearchSimple () {
+			// Note: this grid is 1x2x3 in size
+			final char[][][] grid = new char[][][] { { { 'a', 'b', 'c' },
+													   { 'd', 'f', 'e' } } };
+			final int[][] location = _wordSearch.search(grid, "be");
+			assertNotNull(location);
+			assertEquals(location[0][0], 0);
+			assertEquals(location[0][1], 0);
+			assertEquals(location[0][2], 1);
+			assertEquals(location[1][0], 0);
+			assertEquals(location[1][1], 1);
+			assertEquals(location[1][2], 2);
+	}
 
 	@Test
 	/**
