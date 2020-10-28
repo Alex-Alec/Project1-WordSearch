@@ -48,7 +48,7 @@ public class WordSearchTester {
 			assertEquals(location[1][2], 2);
 	}
 
-	@Test
+	//@Test
 	/**
 	 * Verifies that make can generate a grid when it's *necessary* for words to share
 	 * some common letter locations.

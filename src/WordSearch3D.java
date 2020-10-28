@@ -98,6 +98,11 @@ public class WordSearch3D {
 		return true;
 	}
 
+	private char[] tester(char[] hello){
+		hello[0] = 'a';
+		return null;
+	}
+
 	/**
 	 * Tries to create a word search puzzle of the specified size with the specified
 	 * list of words.
@@ -117,7 +122,7 @@ public class WordSearch3D {
 				return null;
 			}
 		}
-
+		int overallCreationAttempts = 0;
 		for(int i = 0; i < words.length; i++){
 			int randomX = rng.nextInt(sizeX);
 			int randomY = rng.nextInt(sizeY);
@@ -128,9 +133,9 @@ public class WordSearch3D {
 			int randomZDirection = rng.nextInt(3) - 1;
 
 
-			char[][][] tmp = placeWordInGrid(wordSearch, words[i], randomX, randomY, randomZ, randomXDirection, randomYDirection, randomZDirection);
-			while(tmp == null){
-
+			boolean success = placeWordInGrid(wordSearch, words[i], randomX, randomY, randomZ, randomXDirection, randomYDirection, randomZDirection);
+			int failCounter = 0;
+			while(!success && failCounter < 1000){
 				randomX = rng.nextInt(sizeX);
 				randomY = rng.nextInt(sizeY);
 				randomZ = rng.nextInt(sizeZ);
@@ -138,17 +143,34 @@ public class WordSearch3D {
 				randomXDirection = rng.nextInt(3) - 1; // -1, to 1
 				randomYDirection = rng.nextInt(3) - 1;
 				randomZDirection = rng.nextInt(3) - 1;
-				tmp = placeWordInGrid(wordSearch, words[i], randomX, randomY, randomZ, randomXDirection, randomYDirection, randomZDirection);
+				success = placeWordInGrid(wordSearch, words[i], randomX, randomY, randomZ, randomXDirection, randomYDirection, randomZDirection);
+				failCounter++;
+				System.out.println(failCounter);
+//				success = placeWordInGrid(wordSearch, "java", 0, 0, 0, 0, 0, -1);
+//				success = placeWordInGrid(wordSearch, "java", 0, 0, 0, 0, 0,  1);
 			}
-			wordSearch = placeWordInGrid(wordSearch, words[i], randomX, randomY, randomZ, randomXDirection, randomYDirection, randomZDirection);
 			printGrid(wordSearch);
-
+			if(failCounter >= 1000){
+				i = 0;
+				wordSearch = new char[sizeX][sizeY][sizeZ];
+				overallCreationAttempts++;
+				if(overallCreationAttempts>=1000){
+					return null;
+				}
+			}
+		}
+		for(int i = 0; i < sizeX; i++){
+			for(int j = 0; j < sizeY; j++){
+				for(int k = 0; k < sizeZ;k++){
+					if(wordSearch[i][j][k] == '\u0000') {
+						wordSearch[i][j][k] = (char) (rng.nextInt(26) + 'a');
+					}
+				}
+			}
 		}
 
-		final char randomLetter = (char) (rng.nextInt(26) + 'a');
-
-
-		return null;
+		//printGrid(wordSearch);
+		return wordSearch;
 	}
 
 	private void printGrid(char[][][] grid){
@@ -167,22 +189,19 @@ public class WordSearch3D {
 		}
 	}
 
-	private char[][][] placeWordInGrid(char[][][] grid, String word, int startX, int startY, int startZ, int dirX, int dirY, int dirZ ){
-
-		if(grid[startX][startY][startZ] != '\u0000' && grid[startX][startY][startZ] != word.charAt(0)){
-			return null;
-		}
-		grid[startX][startY][startZ] = word.charAt(0);
-		for(int i = 1; i < word.length(); i++){
+	private boolean placeWordInGrid(char[][][] grid, String word, int startX, int startY, int startZ, int dirX, int dirY, int dirZ ){
+		for(int i = 0; i < word.length(); i++){
 			if(!isValidPosition(grid, startX + i * dirX, startY + i * dirY, startZ + i * dirZ)){
-				return null;
+				return false;
 			}
 			if(grid[startX + i * dirX][startY + i * dirY][startZ + i * dirZ] != '\u0000' && grid[startX + i * dirX][startY + i * dirY][startZ + i * dirZ] != word.charAt(i)){
-				return null;
+				return false;
 			}
+		}
+		for(int i = 0; i < word.length(); i++){
 			grid[startX + i * dirX][startY + i * dirY][startZ + i * dirZ] = word.charAt(i);
 		}
-		return grid;
+		return true;
 
 	}
 
@@ -266,9 +285,9 @@ public class WordSearch3D {
 	 */
 	public static void main (String[] args) {
 		final WordSearch3D wordSearch = new WordSearch3D();
-		final String[] words = new String[] { "apple" /*, "orange", "pear", "peach", "durian", "lemon", "lime", "jackfruit", "plum", "grape", "apricot", "blueberry", "tangerine", "coconut", "mango", "lychee", "guava", "strawberry", "kiwi", "kumquat", "persimmon", "papaya", "longan", "eggplant", "cucumber", "tomato", "zucchini", "olive", "pea", "pumpkin", "cherry", "date", "nectarine", "breadfruit", "sapodilla", "rowan", "quince", "toyon", "sorb", "medlar"*/ };
+		final String[] words = new String[] { "apple" , "orange", "pear", "peach", "durian", "lemon", "lime", "jackfruit", /*"plum", "grape", "apricot", "blueberry", "tangerine", "coconut", "mango", "lychee", "guava", "strawberry", "kiwi", "kumquat", "persimmon", "papaya", "longan", "eggplant", "cucumber", "tomato", "zucchini", "olive", "pea", "pumpkin", "cherry", "date", "nectarine", "breadfruit", "sapodilla", "rowan", "quince", "toyon", "sorb", "medlar"*/ };
 		final int xSize = 10, ySize = 10, zSize = 10;
- 		final char[][][] grid = wordSearch.make(words, xSize, ySize, zSize);
+ 		//final char[][][] grid = wordSearch.make(words, xSize, ySize, zSize);
 //		exportGrid(grid, "grid.txt");
 //
 //		final int[][][] locations = wordSearch.searchForAll(grid, words);
@@ -278,5 +297,8 @@ public class WordSearch3D {
 				{ 'd', 'f', 'e' } } };
 		WordSearch3D _wordSearch = new WordSearch3D();
 		final int[][] location = _wordSearch.search(grid2, "be");
+		char[] tester = {'b', 'b','c'};
+		wordSearch.tester(tester);
+		System.out.println(tester[0]);
 	}
 }
