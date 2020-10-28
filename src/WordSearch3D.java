@@ -1,5 +1,4 @@
 import java.util.Random;
-import java.util.*;
 import java.io.*;
 
 /**
@@ -113,7 +112,10 @@ public class WordSearch3D {
 	 * @return a 3-d char array if successful that contains all the words, or <tt>null</tt> if
 	 * no satisfying grid could be found.
 	 */
-	public char[][][] make (String[] words, int sizeX, int sizeY, int sizeZ) {
+	public char[][][] make(String[] words, int sizeX, int sizeY, int sizeZ) {
+		if(sizeX <= 0 || sizeY <= 0 || sizeZ <= 0){
+			return null;
+		}
 		char[][][] wordSearch = new char[sizeX][sizeY][sizeZ];
 		final Random rng = new Random();
 
@@ -131,9 +133,13 @@ public class WordSearch3D {
 			int randomXDirection = rng.nextInt(3) - 1; // -1, to 1
 			int randomYDirection = rng.nextInt(3) - 1;
 			int randomZDirection = rng.nextInt(3) - 1;
+			boolean success;
+			if(!(randomXDirection == 0 && randomYDirection == 0 && randomZDirection == 0)){
+				success = placeWordInGrid(wordSearch, words[i], randomX, randomY, randomZ, randomXDirection, randomYDirection, randomZDirection);
+			}else{
+				success = false;
+			}
 
-
-			boolean success = placeWordInGrid(wordSearch, words[i], randomX, randomY, randomZ, randomXDirection, randomYDirection, randomZDirection);
 			int failCounter = 0;
 			while(!success && failCounter < 1000){
 				randomX = rng.nextInt(sizeX);
@@ -143,13 +149,13 @@ public class WordSearch3D {
 				randomXDirection = rng.nextInt(3) - 1; // -1, to 1
 				randomYDirection = rng.nextInt(3) - 1;
 				randomZDirection = rng.nextInt(3) - 1;
+				if(randomXDirection == 0 && randomYDirection == 0 && randomZDirection == 0){
+					continue;
+				}
 				success = placeWordInGrid(wordSearch, words[i], randomX, randomY, randomZ, randomXDirection, randomYDirection, randomZDirection);
 				failCounter++;
-				System.out.println(failCounter);
-//				success = placeWordInGrid(wordSearch, "java", 0, 0, 0, 0, 0, -1);
-//				success = placeWordInGrid(wordSearch, "java", 0, 0, 0, 0, 0,  1);
 			}
-			printGrid(wordSearch);
+			//printGrid(wordSearch);
 			if(failCounter >= 1000){
 				i = 0;
 				wordSearch = new char[sizeX][sizeY][sizeZ];
@@ -201,6 +207,7 @@ public class WordSearch3D {
 		for(int i = 0; i < word.length(); i++){
 			grid[startX + i * dirX][startY + i * dirY][startZ + i * dirZ] = word.charAt(i);
 		}
+		//printGrid(grid);
 		return true;
 
 	}
@@ -285,20 +292,13 @@ public class WordSearch3D {
 	 */
 	public static void main (String[] args) {
 		final WordSearch3D wordSearch = new WordSearch3D();
-		final String[] words = new String[] { "apple" , "orange", "pear", "peach", "durian", "lemon", "lime", "jackfruit", /*"plum", "grape", "apricot", "blueberry", "tangerine", "coconut", "mango", "lychee", "guava", "strawberry", "kiwi", "kumquat", "persimmon", "papaya", "longan", "eggplant", "cucumber", "tomato", "zucchini", "olive", "pea", "pumpkin", "cherry", "date", "nectarine", "breadfruit", "sapodilla", "rowan", "quince", "toyon", "sorb", "medlar"*/ };
+		final String[] words = new String[] { "apple" , "orange", "pear", "peach", "durian", "lemon", "lime", "jackfruit", "plum", "grape", "apricot", "blueberry", "tangerine", "coconut", "mango", "lychee", "guava", "strawberry", "kiwi", "kumquat", "persimmon", "papaya", "longan", "eggplant", "cucumber", "tomato", "zucchini", "olive", "pea", "pumpkin", "cherry", "date", "nectarine", "breadfruit", "sapodilla", "rowan", "quince", "toyon", "sorb", "medlar" };
 		final int xSize = 10, ySize = 10, zSize = 10;
- 		//final char[][][] grid = wordSearch.make(words, xSize, ySize, zSize);
-//		exportGrid(grid, "grid.txt");
-//
-//		final int[][][] locations = wordSearch.searchForAll(grid, words);
-//		exportLocations(locations, "locations.txt");
+ 		final char[][][] grid = wordSearch.make(words, xSize, ySize, zSize);
+		exportGrid(grid, "grid.txt");
 
-		final char[][][] grid2 = new char[][][] { { { 'a', 'b', 'c' },
-				{ 'd', 'f', 'e' } } };
-		WordSearch3D _wordSearch = new WordSearch3D();
-		final int[][] location = _wordSearch.search(grid2, "be");
-		char[] tester = {'b', 'b','c'};
-		wordSearch.tester(tester);
-		System.out.println(tester[0]);
+		final int[][][] locations = wordSearch.searchForAll(grid, words);
+		exportLocations(locations, "locations.txt");
+
 	}
 }
