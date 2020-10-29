@@ -31,11 +31,19 @@ public class WordSearch3D {
 	 * word, then the method returns a list of the (3-d) locations of its letters; if not, 
 	 */
 	public int[][] search (char[][][] grid, String word) {
+
+		// Loop through every point in the word search
 		for(int i = 0;i < grid.length; i++){
 			for(int j = 0; j < grid[0].length; j++){
 				for(int k = 0; k < grid[0][0].length;k++){
+
+					// Check if the value at the current position matches the first letter of the word
 					if(grid[i][j][k] == word.charAt(0)){
+
+						// If the first letter matches, search in all 26 directions for the word
 						int[][] result = loopThroughAllDirections(grid, word, i, j, k);
+
+						// If the result comes back not null, then the word was found
 						if(result != null){
 							return result;
 						}
@@ -46,14 +54,31 @@ public class WordSearch3D {
 		return null;
 	}
 
-	private int[][] loopThroughAllDirections(char[][][] grid, String word, int iCurrent, int jCurrent, int kCurrent){
-		for(int a = -1; a < 2; a++){
-			for(int b = -1; b < 2; b++){
-				for(int c = -1; c < 2; c++){
-					if(a == 0 && b == 0 && c == 0){
+	/**
+	 * Loops through all 26 direction from a starting point & searches for the word in each of those directions.
+	 * @param grid the grid of character in the word search
+	 * @param word the word being searching for
+	 * @param xStart x coordinate of the starting position
+	 * @param yStart y coordinate of the starting position
+	 * @param zStart z coordinate of the starting position
+	 * @return if this starting value leads to the word, then return the position of the word in a list
+	 */
+	private int[][] loopThroughAllDirections(char[][][] grid, String word, int xStart, int yStart, int zStart){
+
+		// Loops through the 26 possible directions to travel from a point in the grid
+		for(int xDir = -1; xDir < 2; xDir++){
+			for(int yDir = -1; yDir < 2; yDir++){
+				for(int zDir = -1; zDir < 2; zDir++){
+
+					// If the direction is invalid, then skip
+					if(xDir == 0 && yDir == 0 && zDir == 0){
 						continue;
 					}
-					int[][] result = checkDirection(grid, word, iCurrent, jCurrent, kCurrent, a, b, c);
+
+					// Checks for the word in the current direction
+					int[][] result = checkDirection(grid, word, xStart, yStart, zStart, xDir, yDir, zDir);
+
+					// If the result is non-null, than we have located a valid result
 					if(result != null){
 						return result;
 					}
@@ -63,43 +88,64 @@ public class WordSearch3D {
 		return null;
 	}
 
-	// a, b, c {-1, 0, 1} specify movement in that direction
-	//a is up down, b is left right, and c is front back
-	//a is positive, goes down, b is positive go right, c is positive go into page (back)
-	private int[][] checkDirection(char[][][] grid, String word, int iCurrent, int jCurrent, int kCurrent, int a, int b, int c){
+	/**
+	 * Checks for the existence of the word from a starting point and direction in the grid
+	 * @param grid the grid of character in the word search
+	 * @param word the word being searched for
+	 * @param xStart starting x position
+	 * @param yStart starting y position
+	 * @param zStart starting z position
+	 * @param xDir x Direction {-1, 0, 1}
+	 * @param yDir y Direction {-1, 0, 1}
+	 * @param zDir z Direction {-1, 0, 1}
+	 * @return if this starting value leads to the word, then return the position of the word in a list
+	 */
+	private int[][] checkDirection(char[][][] grid, String word, int xStart, int yStart, int zStart, int xDir, int yDir, int zDir){
+
+		// Create a result array
 		int[][] result = new int[word.length()][3];
 
-		for(int i = 1; i < word.length(); i++) {
-			if(!isValidPosition(grid, iCurrent+  i*a, jCurrent + i * b, kCurrent + i*c)) {
+		// Loop through the characters in the word & check if the next letter in the direction continues to match the word
+		for(int i = 0; i < word.length(); i++) {
+
+			// Return if out of bounds
+			if(!isValidPosition(grid, xStart +  i*xDir, yStart + i * yDir, zStart + i * zDir)) {
 				return null;
 			}
-			if(grid[iCurrent+  i*a][jCurrent + i * b][kCurrent + i*c] != word.charAt(i)){
+
+			// Return is the letter doesn't match
+			if(grid[xStart +  i * xDir][yStart + i * yDir][zStart + i * zDir] != word.charAt(i)){
 				return null;
 			}
-			result[i][0] = iCurrent + i*a;
-			result[i][1] = jCurrent + i * b;
-			result[i][2] = kCurrent + i*c;
+
+			// If in bounds & the letter matches, set the corresponding value in the result array to the correct location
+			result[i][0] = xStart + i * xDir;
+			result[i][1] = yStart + i * yDir;
+			result[i][2] = zStart + i * zDir;
 		}
-		result[0][0] = iCurrent;
-		result[0][1] = jCurrent;
-		result[0][2] = kCurrent;
+
 		return result;
 	}
 
-	private boolean isValidPosition(char[][][] grid, int i , int j , int k){
-		if(i < 0 || i >=  grid.length){
+	/**
+	 * Checks if the position is in bounds of the grid
+	 * @param grid the grid used
+	 * @param x the x position
+	 * @param y the y position
+	 * @param z the z position
+	 * @return if the x,y,z coordinate is in bounds of the grid
+	 */
+	private boolean isValidPosition(char[][][] grid, int x, int y, int z){
+
+		// Check if any of the coordinates are out of bounds
+		if(x < 0 || x >=  grid.length){
 			return false;
-		} else if(j < 0 || j >=  grid[0].length){
+		} else if(y < 0 || y >=  grid[0].length){
 			return false;
-		} else if(k < 0 || k >=  grid[0][0].length) {
+		} else if(z < 0 || z >=  grid[0][0].length) {
 			return false;
 		}
 		return true;
-	}
-
-	private char[] tester(char[] hello){
-		hello[0] = 'a';
-		return null;
 	}
 
 	/**
@@ -113,72 +159,106 @@ public class WordSearch3D {
 	 * no satisfying grid could be found.
 	 */
 	public char[][][] make(String[] words, int sizeX, int sizeY, int sizeZ) {
+
+		// Confirms that the inputs from the user are valid
 		if(sizeX <= 0 || sizeY <= 0 || sizeZ <= 0){
 			return null;
 		}
+
+		// Create the wordSearch Grid
 		char[][][] wordSearch = new char[sizeX][sizeY][sizeZ];
+
+		// Create rng
 		final Random rng = new Random();
 
-		for(int i = 0; i < words.length; i++){
-			if(!checkFitWithinGrid(wordSearch, words[i])) {
-				return null;
-			}
-		}
+		// Stores amount of attempts used to generate a grid using the word list
 		int overallCreationAttempts = 0;
+
+		// Confirm that none of the words are impossible to place in the grid alone (too long)
+		if(!checkFitWithinGrid(wordSearch, words)) {
+			return null;
+		}
+
+		// Loop through each word and attempt to place it in the grid
 		for(int i = 0; i < words.length; i++){
-			int randomX = rng.nextInt(sizeX);
-			int randomY = rng.nextInt(sizeY);
-			int randomZ = rng.nextInt(sizeZ);
 
-			int randomXDirection = rng.nextInt(3) - 1; // -1, to 1
-			int randomYDirection = rng.nextInt(3) - 1;
-			int randomZDirection = rng.nextInt(3) - 1;
-			boolean success;
-			if(!(randomXDirection == 0 && randomYDirection == 0 && randomZDirection == 0)){
-				success = placeWordInGrid(wordSearch, words[i], randomX, randomY, randomZ, randomXDirection, randomYDirection, randomZDirection);
-			}else{
-				success = false;
-			}
+			// If you failed to place the word after 10000 attempts, the restart the grid from scratch
+			if(!attemptPlacingWord(wordSearch, words[i], 10000, rng)){
 
-			int failCounter = 0;
-			while(!success && failCounter < 1000){
-				randomX = rng.nextInt(sizeX);
-				randomY = rng.nextInt(sizeY);
-				randomZ = rng.nextInt(sizeZ);
-
-				randomXDirection = rng.nextInt(3) - 1; // -1, to 1
-				randomYDirection = rng.nextInt(3) - 1;
-				randomZDirection = rng.nextInt(3) - 1;
-				if(randomXDirection == 0 && randomYDirection == 0 && randomZDirection == 0){
-					continue;
-				}
-				success = placeWordInGrid(wordSearch, words[i], randomX, randomY, randomZ, randomXDirection, randomYDirection, randomZDirection);
-				failCounter++;
-			}
-			//printGrid(wordSearch);
-			if(failCounter >= 1000){
+				// Reset & increment amount of creation attempts
 				i = 0;
 				wordSearch = new char[sizeX][sizeY][sizeZ];
 				overallCreationAttempts++;
+
+				// If after 1000 attempts, no valid grid has been created, then return null
 				if(overallCreationAttempts>=1000){
 					return null;
 				}
 			}
 		}
-		for(int i = 0; i < sizeX; i++){
-			for(int j = 0; j < sizeY; j++){
-				for(int k = 0; k < sizeZ;k++){
-					if(wordSearch[i][j][k] == '\u0000') {
-						wordSearch[i][j][k] = (char) (rng.nextInt(26) + 'a');
-					}
-				}
-			}
-		}
 
-		//printGrid(wordSearch);
+		// Fill the grid with random chars
+		fillGrid(wordSearch, rng);
+
+		// Debug Statement: printGrid(wordSearch);
+
 		return wordSearch;
 	}
 
+	/**
+	 * Generate random coordinates based on the size parameters
+	 * @param rng random
+	 * @param sizeX size of the grid in the x direction
+	 * @param sizeY size of the grid in the y direction
+	 * @param sizeZ size of the grid in the z direction
+	 * @return an int[] with the randomly generated coordinate
+	 */
+	private int[] generateRandomCoordinate(Random rng, int sizeX, int sizeY, int sizeZ){
+
+		int[] result = new int[3];
+
+		result[0] = rng.nextInt(sizeX);
+		result[1] = rng.nextInt(sizeY);
+		result[2] = rng.nextInt(sizeZ);
+
+		return result;
+	}
+
+	/**
+	 * Generate a random direction
+	 * @param rng
+	 * @return a list of the random direction
+	 */
+	private int[] generateRandomDirection(Random rng){
+
+		int[] result = new int[3];
+
+		result[0] = rng.nextInt(3) - 1; // {-1, 0, 1}
+		result[1] = rng.nextInt(3) - 1; // {-1, 0, 1}
+		result[2] = rng.nextInt(3) - 1; // {-1, 0, 1}
+
+		return result;
+	}
+
+	/**
+	 * Checks if all  the words can fit in the grid
+	 * @param grid word search being worked on
+	 * @param words list of all words that need to be placed
+	 * @return whether the all words can fit in the grid
+	 */
+	private boolean checkFitWithinGrid(char[][][] grid, String[] words){
+		for(int i = 0; i < words.length; i++) {
+			if (words[i].length() > Math.max(Math.max(grid.length, grid[0].length), grid[0][0].length)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Prints the grid for debugging purposes
+	 * @param grid the printed grid
+	 */
 	private void printGrid(char[][][] grid){
 		for(int i = 0; i < grid.length; i++){
 			for(int j = 0; j < grid[0].length; j++){
@@ -195,27 +275,107 @@ public class WordSearch3D {
 		}
 	}
 
-	private boolean placeWordInGrid(char[][][] grid, String word, int startX, int startY, int startZ, int dirX, int dirY, int dirZ ){
+	/**
+	 * Fills untouched parts of the grid with random characters
+	 * @param grid grid that needs to be filled
+	 * @param rng
+	 */
+	private void fillGrid(char[][][] grid, Random rng){
+		for(int i = 0; i < grid.length; i++){
+			for(int j = 0; j < grid[0].length; j++){
+				for(int k = 0; k < grid[0][0].length;k++){
+					if(grid[i][j][k] == '\u0000') {
+						grid[i][j][k] = (char) (rng.nextInt(26) + 'a');
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Attempts placing a word in a grid a given amount of times
+	 * @param wordSearch grid used to place words into
+	 * @param word the word attempted to be placed
+	 * @param maxAttempts maximum number of attempts before giving up
+	 * @param rng
+	 * @return whether it successfully placed the word (true) or gave up (false)
+	 */
+	private boolean attemptPlacingWord(char[][][] wordSearch, String word, int maxAttempts, Random rng){
+
+		// Instantiate variables for use in the while loop
+		boolean success = false;
+		int failCounter = 0;
+
+		int[] newRandomCoordinate;
+		int[] newRandomDirection;
+
+		// Loop runs until the word is successfully placed or the word fails to be placed 10000 times
+		while(!success && failCounter < maxAttempts){
+
+			// Generate a random coordinate and direction
+			newRandomCoordinate = generateRandomCoordinate(rng, wordSearch.length, wordSearch[0].length, wordSearch[0][0].length);
+			newRandomDirection = generateRandomDirection(rng);
+
+			// Attempt to place the word in the grid
+			success = placeWordInGrid(wordSearch, word, newRandomCoordinate, newRandomDirection);
+
+			// Increment the fail counter
+			failCounter++;
+		}
+
+		// Return if it accomplished the task successfully
+		return failCounter >= maxAttempts;
+	}
+
+	/**
+	 * Place a word in the grid based on a start coordinate and a direction
+	 * @param grid
+	 * @param word
+	 * @param startCoordinate
+	 * @param direction
+	 * @return whether the task was successfully accomplished
+	 */
+	private boolean placeWordInGrid(char[][][] grid, String word, int[] startCoordinate, int[] direction){
+
+		int startX = startCoordinate[0];
+		int startY = startCoordinate[1];
+		int startZ = startCoordinate[2];
+
+		int dirX = direction[1];
+		int dirY = direction[2];
+		int dirZ = direction[3];
+
+		// Make sure the direction is valid
+		if(dirX == 0 && dirY == 0 && dirZ == 0){
+			return false;
+		}
+
+		// Loop through each character in the word
 		for(int i = 0; i < word.length(); i++){
-			if(!isValidPosition(grid, startX + i * dirX, startY + i * dirY, startZ + i * dirZ)){
+
+			// Set current positions based on start and direction.
+			int currentX = startX + i * dirX;
+			int currentY = startY + i * dirY;
+			int currentZ = startZ + i * dirZ;
+
+			// Makes sure the position that a character would be placed is in bounds
+			if(!isValidPosition(grid, currentX, currentY, currentZ)){
 				return false;
 			}
-			if(grid[startX + i * dirX][startY + i * dirY][startZ + i * dirZ] != '\u0000' && grid[startX + i * dirX][startY + i * dirY][startZ + i * dirZ] != word.charAt(i)){
+
+			// Makes sure that if a letter already exists where the program wants to place a character that it is the same character
+			if(grid[currentX][currentY][currentZ] != '\u0000' && grid[currentX][currentY][currentZ] != word.charAt(i)){
 				return false;
 			}
 		}
+
+		// If every character would be placed at a valid location then add it to the grid
 		for(int i = 0; i < word.length(); i++){
 			grid[startX + i * dirX][startY + i * dirY][startZ + i * dirZ] = word.charAt(i);
 		}
-		//printGrid(grid);
-		return true;
 
-	}
+		// Debug Statement: printGrid(grid);
 
-	private boolean checkFitWithinGrid(char[][][] grid, String word){
-		if(word.length() > Math.max(Math.max(grid.length, grid[0].length), grid[0][0].length)){
-			return false;
-		}
 		return true;
 	}
 
