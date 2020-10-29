@@ -108,20 +108,25 @@ public class WordSearch3D {
 		// Loop through the characters in the word & check if the next letter in the direction continues to match the word
 		for(int i = 0; i < word.length(); i++) {
 
+			// Current position based on start position and direction
+			int xCurrent = xStart + i * xDir;
+			int yCurrent = yStart + i * yDir;
+			int zCurrent = zStart + i * zDir;
+
 			// Return if out of bounds
-			if(!isValidPosition(grid, xStart +  i*xDir, yStart + i * yDir, zStart + i * zDir)) {
+			if(!isValidPosition(grid, xCurrent, yCurrent, zCurrent)) {
 				return null;
 			}
 
 			// Return is the letter doesn't match
-			if(grid[xStart +  i * xDir][yStart + i * yDir][zStart + i * zDir] != word.charAt(i)){
+			if(grid[xCurrent][yCurrent][zCurrent] != word.charAt(i)){
 				return null;
 			}
 
 			// If in bounds & the letter matches, set the corresponding value in the result array to the correct location
-			result[i][0] = xStart + i * xDir;
-			result[i][1] = yStart + i * yDir;
-			result[i][2] = zStart + i * zDir;
+			result[i][0] = xCurrent;
+			result[i][1] = yCurrent;
+			result[i][2] = zCurrent;
 		}
 
 		return result;
@@ -324,7 +329,7 @@ public class WordSearch3D {
 		}
 
 		// Return if it accomplished the task successfully
-		return failCounter >= maxAttempts;
+		return failCounter <= maxAttempts;
 	}
 
 	/**
@@ -341,9 +346,9 @@ public class WordSearch3D {
 		int startY = startCoordinate[1];
 		int startZ = startCoordinate[2];
 
-		int dirX = direction[1];
-		int dirY = direction[2];
-		int dirZ = direction[3];
+		int dirX = direction[0];
+		int dirY = direction[1];
+		int dirZ = direction[2];
 
 		// Make sure the direction is valid
 		if(dirX == 0 && dirY == 0 && dirZ == 0){

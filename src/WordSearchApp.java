@@ -34,11 +34,6 @@ import javafx.application.Application;
 import javafx.scene.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
-import javafx.scene.shape.Cylinder;
-import javafx.scene.shape.Sphere;
-import javafx.scene.transform.Rotate;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -197,6 +192,7 @@ public class WordSearchApp extends Application {
 		final Map<Tuple, Color> locations = new HashMap<Tuple, Color>();
 		final Random rng = new Random();
 		final String locationsFilename = getParameters().getNamed().get("locations");
+		System.out.println(locationsFilename);
 		if (locationsFilename != null) {  // If user gave us a list of locations
 			final Scanner s = new Scanner(new File(locationsFilename));
 			final int numWords = s.nextInt();
@@ -220,6 +216,7 @@ public class WordSearchApp extends Application {
 	 */
 	private char[][][] loadGrid () throws FileNotFoundException, IllegalArgumentException {
 		final String gridFilename = getParameters().getNamed().get("grid");
+		System.out.println(gridFilename);
 		if (gridFilename == null) {
 			throw new IllegalArgumentException("No \"grid\" in parameters list");
 		}
