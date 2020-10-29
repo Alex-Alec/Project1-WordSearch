@@ -169,7 +169,7 @@ public class WordSearchTester {
 	 */
 	public void testMakeTooManyWords(){
 		final String[] words = new String[] { "abc", "def", "ghi", "jkl", "nmo", "pqr", "stu", "vwx", "yz", "qj", "su", "gi", "cde", "ja", "zh" };
-		final char[][][] grid = _wordSearch.make(words, 3, 3, 3);
+		final char[][][] grid = _wordSearch.make(words, 3, 2, 2);
 		assertNull(grid);
 	}
 

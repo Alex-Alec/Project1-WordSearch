@@ -35,7 +35,7 @@ public class WordSearch3D {
 		// Loop through every point in the word search
 		for(int i = 0;i < grid.length; i++){
 			for(int j = 0; j < grid[0].length; j++){
-				for(int k = 0; k < grid[0][0].length;k++){
+				for(int k = 0; k < grid[0][0].length; k++){
 
 					// Check if the value at the current position matches the first letter of the word
 					if(grid[i][j][k] == word.charAt(0)){
@@ -187,8 +187,9 @@ public class WordSearch3D {
 		// Loop through each word and attempt to place it in the grid
 		for(int i = 0; i < words.length; i++){
 
-			// If you failed to place the word after 10000 attempts, the restart the grid from scratch
-			if(!attemptPlacingWord(wordSearch, words[i], 10000, rng)){
+			// If you failed to place the word after 1000 * 26 attempts, the restart the grid from scratch
+			// Max Attempts: Need to try 26 different directions per starting points, so to attempt 1000 starting points need about 26000 to cover most of them
+			if(!attemptPlacingWord(wordSearch, words[i], 1000 * 26, rng)){
 
 				// Reset & increment amount of creation attempts
 				i = 0;
@@ -329,7 +330,7 @@ public class WordSearch3D {
 		}
 
 		// Return if it accomplished the task successfully
-		return failCounter <= maxAttempts;
+		return failCounter < maxAttempts;
 	}
 
 	/**
