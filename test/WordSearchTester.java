@@ -77,10 +77,10 @@ public class WordSearchTester {
 		}
 	}
 
-	/* TODO: write more methods for both make and search. */
-
 	@Test
-
+	/**
+	 * Verifies that search returns null if a word is not in a given grid
+	 */
 	public void testAbsentWord(){
 		final char[][][] grid = new char[][][] { { { 'c', 'a', 't' },
 													{ 'd', 't', 'j' },
@@ -92,7 +92,9 @@ public class WordSearchTester {
 	}
 
 	@Test
-
+	/**
+	 * Verifies that search returns null if a word could not fit in a given grid
+	 */
 	public void testOverSizedWord(){
 		final char[][][] grid = new char[][][] { { { 'c', 'a', 't' },
 													{ 'd', 't', 'j' },
@@ -104,7 +106,9 @@ public class WordSearchTester {
 	}
 
 	@Test
-
+	/**
+	 * Verifies that search returns null if looking for the default char ('/u0000') in a given grid
+	 */
 	public void testSearchDefaultCharacter(){
 		final char[][][] grid = new char[][][] { {
 				{ 'c', 'a', 't' },
@@ -118,7 +122,9 @@ public class WordSearchTester {
 	}
 
 	@Test
-
+	/**
+	 * Verifies that search returns null if searching for a word that is only partially in a given grid
+	 */
 	public void testWordOutOfBounds() {
 		final char[][][] grid = new char[][][] { {
 				{ 'c', 'a', 't' },
@@ -133,7 +139,9 @@ public class WordSearchTester {
 
 
 	@Test
-
+	/**
+	 * Verifies that search returns a correct array of coordinates for a word that is in a given grid
+	 */
 	public void testSearchBaseline(){
 		final char[][][] grid = new char[][][] { { { 'c', 'a', 't' },
 													{ 'd', 't', 'j' },
@@ -156,7 +164,9 @@ public class WordSearchTester {
 	}
 
 	@Test
-
+	/**
+	 * Verifies that make returns null if given too many words to be able to make a valid grid
+	 */
 	public void testMakeTooManyWords(){
 		final String[] words = new String[] { "abc", "def", "ghi", "jkl", "nmo", "pqr", "stu", "vwx", "yz", "qj", "su", "gi", "cde", "ja", "zh" };
 		final char[][][] grid = _wordSearch.make(words, 3, 3, 3);
@@ -164,7 +174,11 @@ public class WordSearchTester {
 	}
 
 	@Test
-
+	/**
+	 * Verifies that make returns null if given invalid search parameters (2 cases)
+	 * 1st case: 0 as invalid parameter
+	 * 2nd case: -1 as invalid parameter
+	 */
 	public void testInvalidSizeParameters(){
 		final String[] words = new String[] { "java" };
 		final char[][][] grid = _wordSearch.make(words, 1, 3, 0);
@@ -174,18 +188,21 @@ public class WordSearchTester {
 	}
 
 	@Test
-
+	/**
+	 * Verifies that make creates a valid grid when given words that completely fill every coordinate of grid
+	 */
 	public void testFullyPackedGrid(){
 		final String[] words = new String[] { "aa",  "bb", "cc", "dd"};
 		final char[][][] grid = _wordSearch.make(words, 2, 2, 2);
 		for(int i = 0; i < words.length; i++) {
 			assertNotNull(_wordSearch.search(grid, words[i]));
 		}
-
 	}
 
 	@Test
-
+	/**
+	 * Verifies that make can create a valid grid given a list of words and size parameters
+	 */
 	public void testMakeBaseline(){
 		final String[] words = new String[] { "cat",  "dog", "bird", "snake", "mouse"};
 		final  char[][][] grid = _wordSearch.make(words, 5, 5, 5);
@@ -193,6 +210,9 @@ public class WordSearchTester {
 	}
 
 	@Before
+	/**
+	 * instantiates a wordSearch3D object for tests
+	 */
 	public void setUp () {
 		_wordSearch = new WordSearch3D();
 	}
