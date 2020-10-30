@@ -106,6 +106,33 @@ public class WordSearch3D {
 		int[][] result = new int[word.length()][3];
 
 		// Loop through the characters in the word & check if the next letter in the direction continues to match the word
+		if(!isValidWordPlacement(grid, word, xStart, yStart, zStart, xDir, yDir, zDir)){
+			return null;
+		}
+
+		for(int i = 0; i < word.length(); i++){
+			result[i][0] = xStart + i * xDir;
+			result[i][1] = yStart + i * yDir;
+			result[i][2] = zStart + i * zDir;
+		}
+
+		return result;
+	}
+
+	/**
+	 * Checks if the word can be validly placed given a start & direction. Used in make & search.
+	 * @param grid word search puzzle
+	 * @param word word being placed
+	 * @param xStart starting x coordinate
+	 * @param yStart starting y coordinate
+	 * @param zStart starting z coordinate
+	 * @param xDir x direction
+	 * @param yDir y direction
+	 * @param zDir z direction
+	 * @return if the word can be validly placed
+	 */
+	private boolean isValidWordPlacement(char[][][] grid, String word, int xStart, int yStart, int zStart, int xDir, int yDir, int zDir){
+
 		for(int i = 0; i < word.length(); i++) {
 
 			// Current position based on start position and direction
@@ -114,22 +141,21 @@ public class WordSearch3D {
 			int zCurrent = zStart + i * zDir;
 
 			// Return if out of bounds
-			if(!isValidPosition(grid, xCurrent, yCurrent, zCurrent)) {
-				return null;
+			if (!isValidPosition(grid, xCurrent, yCurrent, zCurrent)) {
+				return false;
 			}
 
-			// Return is the letter doesn't match
-			if(grid[xCurrent][yCurrent][zCurrent] != word.charAt(i)){
-				return null;
+			// Check if is a blank space
+			if(grid[xCurrent][yCurrent][zCurrent] == '\u0000'){
+				continue;
 			}
 
-			// If in bounds & the letter matches, set the corresponding value in the result array to the correct location
-			result[i][0] = xCurrent;
-			result[i][1] = yCurrent;
-			result[i][2] = zCurrent;
+			// Return if the letter doesn't match
+			if (grid[xCurrent][yCurrent][zCurrent] != word.charAt(i)) {
+				return false;
+			}
 		}
-
-		return result;
+		return true;
 	}
 
 	/**
@@ -232,7 +258,7 @@ public class WordSearch3D {
 
 	/**
 	 * Generate a random direction
-	 * @param rng
+	 * @param rng Random
 	 * @return a list of the random direction
 	 */
 	private int[] generateRandomDirection(Random rng){
@@ -284,7 +310,7 @@ public class WordSearch3D {
 	/**
 	 * Fills untouched parts of the grid with random characters
 	 * @param grid grid that needs to be filled
-	 * @param rng
+	 * @param rng Random
 	 */
 	private void fillGrid(char[][][] grid, Random rng){
 		for(int i = 0; i < grid.length; i++){
@@ -303,7 +329,7 @@ public class WordSearch3D {
 	 * @param wordSearch grid used to place words into
 	 * @param word the word attempted to be placed
 	 * @param maxAttempts maximum number of attempts before giving up
-	 * @param rng
+	 * @param rng Random
 	 * @return whether it successfully placed the word (true) or gave up (false)
 	 */
 	private boolean attemptPlacingWord(char[][][] wordSearch, String word, int maxAttempts, Random rng){
@@ -335,10 +361,10 @@ public class WordSearch3D {
 
 	/**
 	 * Place a word in the grid based on a start coordinate and a direction
-	 * @param grid
-	 * @param word
-	 * @param startCoordinate
-	 * @param direction
+	 * @param grid word search puzzle
+	 * @param word word being placed
+	 * @param startCoordinate list of start coordinates
+	 * @param direction list of directions
 	 * @return whether the task was successfully accomplished
 	 */
 	private boolean placeWordInGrid(char[][][] grid, String word, int[] startCoordinate, int[] direction){
@@ -357,22 +383,8 @@ public class WordSearch3D {
 		}
 
 		// Loop through each character in the word
-		for(int i = 0; i < word.length(); i++){
-
-			// Set current positions based on start and direction.
-			int currentX = startX + i * dirX;
-			int currentY = startY + i * dirY;
-			int currentZ = startZ + i * dirZ;
-
-			// Makes sure the position that a character would be placed is in bounds
-			if(!isValidPosition(grid, currentX, currentY, currentZ)){
-				return false;
-			}
-
-			// Makes sure that if a letter already exists where the program wants to place a character that it is the same character
-			if(grid[currentX][currentY][currentZ] != '\u0000' && grid[currentX][currentY][currentZ] != word.charAt(i)){
-				return false;
-			}
+		if(!isValidWordPlacement(grid, word, startX, startY, startZ, dirX, dirY, dirZ)){
+			return false;
 		}
 
 		// If every character would be placed at a valid location then add it to the grid
